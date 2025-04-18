@@ -1,0 +1,26 @@
+body {
+  margin: 20px 100px;
+  background-color: rgb(246, 238, 178);
+}
+
+div {
+  margin-top: 20px;
+}
+
+li {}
+
+.addBtn {
+  border-radius: 30px;
+  background-color: rgb(93, 203, 93);
+  color: white;
+  padding: 5px;
+  margin: 10px;
+}
+
+.removeBtn {
+  border-radius: 30px;
+  background-color: rgb(222, 64, 64);
+  color: white;
+  padding: 5px;
+  margin: 10px;
+}
