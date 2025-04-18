@@ -14,16 +14,20 @@ function App() {
   const addToCart = (product) => {
     const isAlreadyInCart = addedProducts.find(p => p.name === product.name);
     if (isAlreadyInCart) {
-      updateProductQuantity(product.name);
+      updateProductQuantity(product.name, isAlreadyInCart.quantity + 1);
     } else {
       setAddedProducts([...addedProducts, { ...product, quantity: 1 }]);
     }
   };
 
-  const updateProductQuantity = (productName) => {
+  const updateProductQuantity = (productName, newQuantity) => {
+    const quantity = parseInt(newQuantity);
+
+    if (isNaN(quantity) || quantity < 1) return; // per bloccare input invalidi
+
     setAddedProducts(prev =>
       prev.map(p =>
-        p.name === productName ? { ...p, quantity: p.quantity + 1 } : p
+        p.name === productName ? { ...p, quantity } : p
       )
     );
   };
@@ -62,7 +66,14 @@ function App() {
           <ul>
             {addedProducts.map((product, index) => (
               <li key={index}>
-                <strong>{product.name}</strong>: <span>€{product.price.toFixed(2)}</span> × {product.quantity}
+                <strong>{product.name}</strong>: <span>€{product.price.toFixed(2)}</span> ×
+                <input
+                  type="number"
+                  min='1'
+                  step='1'
+                  value={product.quantity}
+                  onChange={(e) => updateProductQuantity(product.name, e.target.value)}
+                />
                 <button className="removeBtn" onClick={() => removeFromCart(product.name)}>
                   Rimuovi dal carrello
                 </button>

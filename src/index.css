@@ -7,20 +7,25 @@ div {
   margin-top: 20px;
 }
 
-li {}
-
 .addBtn {
-  border-radius: 30px;
   background-color: rgb(93, 203, 93);
   color: white;
-  padding: 5px;
+  border-radius: 30px;
+  border: 2px solid green;
+  padding: 8px;
   margin: 10px;
 }
 
 .removeBtn {
-  border-radius: 30px;
   background-color: rgb(222, 64, 64);
   color: white;
-  padding: 5px;
+  border-radius: 30px;
+  border: 2px solid rgb(133, 20, 20);
+  padding: 8px;
   margin: 10px;
+}
+
+input {
+  width: 60px;
+  margin: 0 10px
 }
