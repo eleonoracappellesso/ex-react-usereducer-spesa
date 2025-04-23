@@ -1,4 +1,42 @@
-import { useState } from "react";
+import { useReducer } from "react";
+
+const initialState = [];
+
+function cartReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_ITEM': {
+      const existingItem = state.find(p => p.name === action.payload.name);
+      if (existingItem) {
+        // Se già presente, aumentiamo la quantità
+        return state.map(p =>
+          p.name === action.payload.name
+            ? { ...p, quantity: p.quantity + 1 }
+            : p
+        );
+      } else {
+        // Altrimenti aggiungiamo nuovo prodotto
+        return [...state, { ...action.payload, quantity: 1 }];
+      }
+    }
+
+    case 'REMOVE_ITEM':
+      return state.filter(p => p.name !== action.payload.name);
+
+    case 'UPDATE_QUANTITY': {
+      const newQuantity = parseInt(action.payload.quantity);
+      if (isNaN(newQuantity) || newQuantity < 1) return state;
+
+      return state.map(p =>
+        p.name === action.payload.name
+          ? { ...p, quantity: newQuantity }
+          : p
+      );
+    }
+
+    default:
+      return state;
+  }
+}
 
 function App() {
 
@@ -9,38 +47,25 @@ function App() {
     { name: 'Pasta', price: 0.7 },
   ];
 
-  const [addedProducts, setAddedProducts] = useState([]);
+  const [cart, dispatch] = useReducer(cartReducer, initialState);
 
-  const addToCart = (product) => {
-    const isAlreadyInCart = addedProducts.find(p => p.name === product.name);
-    if (isAlreadyInCart) {
-      updateProductQuantity(product.name, isAlreadyInCart.quantity + 1);
-    } else {
-      setAddedProducts([...addedProducts, { ...product, quantity: 1 }]);
-    }
+  const handleAddToCart = (product) => {
+    dispatch({ type: 'ADD_ITEM', payload: product });
   };
 
-  const updateProductQuantity = (productName, newQuantity) => {
-    const quantity = parseInt(newQuantity);
-
-    if (isNaN(quantity) || quantity < 1) return; // per bloccare input invalidi
-
-    setAddedProducts(prev =>
-      prev.map(p =>
-        p.name === productName ? { ...p, quantity } : p
-      )
-    );
+  const handleRemoveFromCart = (name) => {
+    dispatch({ type: 'REMOVE_ITEM', payload: { name } });
   };
 
-  const removeFromCart = (productName) => {
-    setAddedProducts(prev => prev.filter(p => p.name !== productName));
+  const handleQuantityChange = (name, quantity) => {
+    dispatch({ type: 'UPDATE_QUANTITY', payload: { name, quantity } });
   };
 
-  const calculateTotal = () => {
-    return addedProducts.reduce((total, product) => {
-      return total + product.price * product.quantity;
-    }, 0).toFixed(2);
-  };
+  const calculateTotal = () =>
+    cart
+      .reduce((sum, item) => sum + item.price * item.quantity, 0)
+      .toFixed(2);
+
 
   return (
     <>
@@ -52,7 +77,7 @@ function App() {
           {products.map((product, index) => (
             <li key={index}>
               <strong>{product.name}</strong>: <span>€{product.price.toFixed(2)}</span>
-              <button className="addBtn" onClick={() => addToCart(product)}>
+              <button className="addBtn" onClick={() => handleAddToCart(product)}>
                 Aggiungi al carrello
               </button>
             </li>
@@ -60,11 +85,11 @@ function App() {
         </ul>
       </div>
 
-      {addedProducts.length > 0 && (
+      {cart.length > 0 && (
         <div>
           <h2>Prodotti nel carrello:</h2>
           <ul>
-            {addedProducts.map((product, index) => (
+            {cart.map((product, index) => (
               <li key={index}>
                 <strong>{product.name}</strong>: <span>€{product.price.toFixed(2)}</span> ×
                 <input
@@ -72,9 +97,9 @@ function App() {
                   min='1'
                   step='1'
                   value={product.quantity}
-                  onChange={(e) => updateProductQuantity(product.name, e.target.value)}
+                  onChange={(e) => handleQuantityChange(product.name, e.target.value)}
                 />
-                <button className="removeBtn" onClick={() => removeFromCart(product.name)}>
+                <button className="removeBtn" onClick={() => handleRemoveFromCart(product.name)}>
                   Rimuovi dal carrello
                 </button>
               </li>
@@ -89,3 +114,8 @@ function App() {
 }
 
 export default App
+
+
+
+
+
